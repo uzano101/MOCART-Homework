@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Managers;
+using TMPro;
 using UnityEngine.Networking;
 
 namespace Loaders
@@ -25,9 +26,19 @@ namespace Loaders
             public Product[] products;
         }
 
+        private float _timer;
+        
+        [SerializeField] private TextMeshProUGUI loadingText;
+
         private void Start()
         {
             StartCoroutine(LoadGameSequence());
+        }
+        
+        private void Update()
+        {
+            _timer += Time.deltaTime * 2;
+            loadingText.text = "Loading" + new string('.', (int)(_timer % 3) + 1);
         }
 
         private IEnumerator LoadGameSequence()
@@ -94,6 +105,7 @@ namespace Loaders
         {
             Debug.Log("Loading Main Scene...");
             SceneManager.sceneLoaded += OnMainSceneLoaded;
+            yield return new WaitForSeconds(3);
             SceneManager.LoadScene("Main");
 
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Main");

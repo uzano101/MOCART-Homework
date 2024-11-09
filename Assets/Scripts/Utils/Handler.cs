@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Managers;
 using TMPro;
@@ -9,6 +10,8 @@ namespace Utils
     {
         [SerializeField] private GameObject[] itemsInfoPanels;
         [SerializeField] private GameObject submitButton;
+        [SerializeField] private GameObject enterNewNameText;
+        [SerializeField] private GameObject enterNewPriceText;
 
         [SerializeField] private TMP_InputField[] nameInputFields;
         [SerializeField] private TMP_InputField[] priceInputFields;
@@ -28,15 +31,17 @@ namespace Utils
 
             _panelEditIdx = index;
             itemsInfoPanels[index].GetComponent<Animator>().SetBool("Active", true);
-            StartCoroutine(DelaySubmitButton());
+            StartCoroutine(DelayExtraUIComponents());
         }
 
-        private IEnumerator DelaySubmitButton()
+        private IEnumerator DelayExtraUIComponents()
         {
-            yield return new WaitForSeconds(0.35f);
+            yield return new WaitForSeconds(0.4f);
             submitButton.SetActive(true);
             nameInputFields[_panelEditIdx].gameObject.SetActive(true);
             priceInputFields[_panelEditIdx].gameObject.SetActive(true);
+            enterNewNameText.SetActive(true);
+            enterNewPriceText.SetActive(true);
             
             var product = ShopManager.Instance.GetProducts()[_panelEditIdx];
             _originalName = product.name;
@@ -57,33 +62,43 @@ namespace Utils
                 isValid = false;
                 nameInputFields[_panelEditIdx].text = _originalName;
             }
-            else
+            else if (newName != _originalName && isValid)
             {
                 ShopManager.Instance.UpdateProductName(_panelEditIdx, newName);
+                ShowMessage("Product name updated successfully");
             }
-
+            
             if (!float.TryParse(priceInputFields[_panelEditIdx].text, out float newPrice))
             {
                 ShowMessage("Invalid price format. Please enter a valid number");
                 isValid = false;
                 priceInputFields[_panelEditIdx].text = _originalPrice;
             }
-            else if (isValid)
+            else if (_originalPrice != newPrice.ToString("F2") && isValid)
             {
+                newPrice = (float)Math.Round(newPrice, 2);
                 ShopManager.Instance.UpdateProductPrice(_panelEditIdx, newPrice);
+                ShowMessage("Product price updated successfully");
             }
 
             if (!isValid)
             {
                 return;
             }
+            
+            
+            DeactivateExtraUIComponents();
+            itemsInfoPanels[_panelEditIdx].GetComponent<Animator>().SetBool("Active", false);
+            _panelEditIdx = -1;
+        }
 
+        private void DeactivateExtraUIComponents()
+        {
             submitButton.SetActive(false);
             nameInputFields[_panelEditIdx].gameObject.SetActive(false);
             priceInputFields[_panelEditIdx].gameObject.SetActive(false);
-            itemsInfoPanels[_panelEditIdx].GetComponent<Animator>().SetBool("Active", false);
-            _panelEditIdx = -1;
-            ShowMessage("Product updated successfully");
+            enterNewNameText.SetActive(false);
+            enterNewPriceText.SetActive(false);
         }
 
         private void SetInputFieldText(int index, string fieldType, string placeholderText)
@@ -100,16 +115,16 @@ namespace Utils
             }
         }
 
-        private void ShowMessage(string message)
+        private void ShowMessage(string messageToShow)
         {
-            if (this.message != null)
+            if (message != null)
             {
-                this.message.text = message;
-                Color color = this.message.color;
+                message.text = messageToShow;
+                Color color = message.color;
                 color.a = 1f;
-                this.message.color = color;
+                message.color = color;
                 
-                this.message.gameObject.SetActive(true);
+                message.gameObject.SetActive(true);
                 StartCoroutine(FadeOutMessage(3f));
             }
         }
@@ -132,5 +147,9 @@ namespace Utils
 
             message.gameObject.SetActive(false);
         }
+        
+
+        
+        
     }
 }
