@@ -1,27 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
 namespace Managers
 {
     public class UIManager : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject[] itemsInfoPanels;
-        
-        [SerializeField]
-        private TextMeshProUGUI[] namesText;
-        [SerializeField]
-        private TextMeshProUGUI[] descriptionText;
-        [SerializeField]
-        private TextMeshProUGUI[] priceText;
-        
-        [SerializeField]
-        private TextMeshProUGUI totalPriceText;
-        
+        /// <summary>
+        /// Serialized fields
+        /// </summary>
+        [SerializeField] private GameObject[] itemsInfoPanels;
+
+        [SerializeField] private TextMeshProUGUI[] namesText;
+        [SerializeField] private TextMeshProUGUI[] descriptionText;
+        [SerializeField] private TextMeshProUGUI[] priceText;
+
+        [SerializeField] private TextMeshProUGUI totalPriceText;
+
+
+        // End Of Local Variables
         
         private void Start()
         {
@@ -46,8 +42,8 @@ namespace Managers
                 priceText[i].text = products[i].price.ToString();
                 totalPrice += products[i].price;
             }
+
             totalPriceText.text = totalPrice.ToString();
         }
-        
     }
 }

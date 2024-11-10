@@ -8,8 +8,15 @@ namespace Managers
 {
     public class ProductFetcher : MonoBehaviour
     {
-        private readonly string _serverUrl = "https://homework.mocart.io/api/products";
+        /// <summary>
+        /// Product fetcher server URL
+        /// </summary>
+        private const string ServerUrl = "https://homework.mocart.io/api/products";
 
+
+        /// <summary>
+        /// Serializable classes
+        /// </summary>
         [Serializable]
         public class Product
         {
@@ -24,6 +31,9 @@ namespace Managers
             public Product[] products;
         }
 
+        
+        // End Of Local Variables
+        
         public void Start()
         {
             StartCoroutine(FetchAndDisplayProducts());
@@ -31,7 +41,7 @@ namespace Managers
 
         private IEnumerator FetchAndDisplayProducts()
         {
-            UnityWebRequest request = UnityWebRequest.Get(_serverUrl);
+            UnityWebRequest request = UnityWebRequest.Get(ServerUrl);
 
             yield return request.SendWebRequest();
 
@@ -66,5 +76,9 @@ namespace Managers
             }
         }
 
+        public static string GetServerUrl()
+        {
+            return ServerUrl;
+        }
     }
 }

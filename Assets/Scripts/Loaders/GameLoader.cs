@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,25 +9,19 @@ namespace Loaders
 {
     public class GameLoader : MonoBehaviour
     {
-        private readonly string _serverUrl = "https://homework.mocart.io/api/products";
-
-        [Serializable]
-        public class Product
-        {
-            public string name;
-            public string description;
-            public float price;
-        }
-
-        [Serializable]
-        public class ProductData
-        {
-            public Product[] products;
-        }
-
+        /// <summary>
+        /// Private fields
+        /// </summary>
         private float _timer;
         
+        
+        /// <summary>
+        /// Serialized fields
+        /// </summary>
         [SerializeField] private TextMeshProUGUI loadingText;
+        
+        
+        // End Of Local Variables
 
         private void Start()
         {
@@ -54,7 +47,7 @@ namespace Loaders
 
         private IEnumerator FetchAndDisplayProducts()
         {
-            using (UnityWebRequest request = UnityWebRequest.Get(_serverUrl))
+            using (UnityWebRequest request = UnityWebRequest.Get(ProductFetcher.GetServerUrl()))
             {
                 yield return request.SendWebRequest();
 
@@ -67,7 +60,7 @@ namespace Loaders
                 string jsonResponse = request.downloadHandler.text;
                 Debug.Log("Received JSON: " + jsonResponse);
 
-                ProductData productData = JsonUtility.FromJson<ProductData>(jsonResponse);
+                ProductFetcher.ProductData productData = JsonUtility.FromJson<ProductFetcher.ProductData>(jsonResponse);
 
                 if (productData.products != null && productData.products.Length > 0)
                 {
@@ -80,7 +73,7 @@ namespace Loaders
             }
         }
 
-        private void DisplayProducts(Product[] products)
+        private void DisplayProducts(ProductFetcher.Product[] products)
         {
             ShopManager.Instance.ClearProducts();
             foreach (var product in products)

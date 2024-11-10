@@ -8,7 +8,11 @@ namespace Utils
 {
     public class Handler : MonoBehaviour
     {
+        /// <summary>
+        /// Serialized fields
+        /// </summary>
         [SerializeField] private GameObject[] itemsInfoPanels;
+
         [SerializeField] private GameObject submitButton;
         [SerializeField] private GameObject enterNewNameText;
         [SerializeField] private GameObject enterNewPriceText;
@@ -18,12 +22,21 @@ namespace Utils
 
         [SerializeField] private TextMeshProUGUI message;
 
+
+        /// <summary>
+        /// Private fields
+        /// </summary>
         private int _panelEditIdx = -1;
+
         private string _originalName;
         private string _originalPrice;
 
-        private TouchScreenKeyboard keyboard;
-        private TMP_InputField activeInputField;
+        private TouchScreenKeyboard _keyboard;
+
+        private TMP_InputField _activeInputField;
+
+
+        // End Of Local Variables
 
         private void Update()
         {
@@ -59,7 +72,6 @@ namespace Utils
 
         private void HandleTouchKeyboard()
         {
-            // Check if any input field is focused
             foreach (var inputField in nameInputFields)
             {
                 if (inputField.isFocused)
@@ -78,25 +90,23 @@ namespace Utils
                 }
             }
 
-            // If no input field is focused, hide the keyboard
-            if (keyboard != null && !keyboard.active)
+            if (_keyboard != null && !_keyboard.active)
             {
-                keyboard = null;
+                _keyboard = null;
             }
         }
 
         private void OpenTouchKeyboard(TMP_InputField inputField)
         {
-            if (keyboard == null || !keyboard.active)
+            if (_keyboard == null || !_keyboard.active)
             {
-                keyboard = TouchScreenKeyboard.Open(inputField.text, TouchScreenKeyboardType.Default);
-                activeInputField = inputField;
+                _keyboard = TouchScreenKeyboard.Open(inputField.text, TouchScreenKeyboardType.Default);
+                _activeInputField = inputField;
             }
 
-            // Sync the keyboard content with the input field
-            if (keyboard != null && keyboard.active && activeInputField != null)
+            if (_keyboard != null && _keyboard.active && _activeInputField != null)
             {
-                activeInputField.text = keyboard.text;
+                _activeInputField.text = _keyboard.text;
             }
         }
 

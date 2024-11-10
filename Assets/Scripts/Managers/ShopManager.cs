@@ -6,23 +6,32 @@ namespace Managers
 {
     public class ShopManager
     {
-        private static ShopManager instance;
-        private List<ProductFetcher.Product> _products = new List<ProductFetcher.Product>();
+        /// <summary>
+        /// Private fields
+        /// </summary>
+        private static ShopManager _instance;
+        private readonly List<ProductFetcher.Product> _products = new List<ProductFetcher.Product>();
         
+        
+        /// <summary>
+        /// Public fields
+        /// </summary>
         public event Action OnProductsUpdated;
         
         public static ShopManager Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new ShopManager();
+                    _instance = new ShopManager();
                 }
-                return instance;
+                return _instance;
             }
         }
         
+        
+        // End Of Local Variables
 
         public void ClearProducts()
         {
