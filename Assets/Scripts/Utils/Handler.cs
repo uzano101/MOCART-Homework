@@ -15,19 +15,25 @@ namespace Utils
 
         [SerializeField] private TMP_InputField[] nameInputFields;
         [SerializeField] private TMP_InputField[] priceInputFields;
-        
+
         [SerializeField] private TextMeshProUGUI message;
 
         private int _panelEditIdx = -1;
         private string _originalName;
         private string _originalPrice;
 
+        private TouchScreenKeyboard keyboard;
+        private TMP_InputField activeInputField;
+
+        private void Update()
+        {
+            HandleTouchKeyboard();
+        }
+
         public void OnEditButtonPressed(int index)
         {
             if (_panelEditIdx != -1)
-            {
                 return;
-            }
 
             _panelEditIdx = index;
             itemsInfoPanels[index].GetComponent<Animator>().SetBool("Active", true);
@@ -42,13 +48,56 @@ namespace Utils
             priceInputFields[_panelEditIdx].gameObject.SetActive(true);
             enterNewNameText.SetActive(true);
             enterNewPriceText.SetActive(true);
-            
+
             var product = ShopManager.Instance.GetProducts()[_panelEditIdx];
             _originalName = product.name;
             _originalPrice = product.price.ToString("F2");
 
             SetInputFieldText(_panelEditIdx, "name", _originalName);
             SetInputFieldText(_panelEditIdx, "price", _originalPrice);
+        }
+
+        private void HandleTouchKeyboard()
+        {
+            // Check if any input field is focused
+            foreach (var inputField in nameInputFields)
+            {
+                if (inputField.isFocused)
+                {
+                    OpenTouchKeyboard(inputField);
+                    return;
+                }
+            }
+
+            foreach (var inputField in priceInputFields)
+            {
+                if (inputField.isFocused)
+                {
+                    OpenTouchKeyboard(inputField);
+                    return;
+                }
+            }
+
+            // If no input field is focused, hide the keyboard
+            if (keyboard != null && !keyboard.active)
+            {
+                keyboard = null;
+            }
+        }
+
+        private void OpenTouchKeyboard(TMP_InputField inputField)
+        {
+            if (keyboard == null || !keyboard.active)
+            {
+                keyboard = TouchScreenKeyboard.Open(inputField.text, TouchScreenKeyboardType.Default);
+                activeInputField = inputField;
+            }
+
+            // Sync the keyboard content with the input field
+            if (keyboard != null && keyboard.active && activeInputField != null)
+            {
+                activeInputField.text = keyboard.text;
+            }
         }
 
         public void OnSubmitButtonPressed()
@@ -67,7 +116,7 @@ namespace Utils
                 ShopManager.Instance.UpdateProductName(_panelEditIdx, newName);
                 ShowMessage("Product name updated successfully");
             }
-            
+
             if (!float.TryParse(priceInputFields[_panelEditIdx].text, out float newPrice))
             {
                 ShowMessage("Invalid price format. Please enter a valid number");
@@ -82,11 +131,8 @@ namespace Utils
             }
 
             if (!isValid)
-            {
                 return;
-            }
-            
-            
+
             DeactivateExtraUIComponents();
             itemsInfoPanels[_panelEditIdx].GetComponent<Animator>().SetBool("Active", false);
             _panelEditIdx = -1;
@@ -123,7 +169,7 @@ namespace Utils
                 Color color = message.color;
                 color.a = 1f;
                 message.color = color;
-                
+
                 message.gameObject.SetActive(true);
                 StartCoroutine(FadeOutMessage(3f));
             }
@@ -147,9 +193,5 @@ namespace Utils
 
             message.gameObject.SetActive(false);
         }
-        
-
-        
-        
     }
 }
